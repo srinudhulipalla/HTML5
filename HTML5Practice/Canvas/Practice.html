@@ -19,14 +19,14 @@
 
         function startGM() {
             myGM.start();
-            redBox = new component(50, 50, 10, 10, "red");
+            redBox = new component(50, 50, 10, 10, "red");            
             //opponentBox = new component(10, 200, 400, 200, "green");
         }
 
         var myGM = {
             canvas: document.createElement("canvas"),
             start: function () {
-                this.canvas.width = 500,
+                this.canvas.width = 800,
                 this.canvas.height = 500,
                 this.context = this.canvas.getContext("2d");
                 document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -71,7 +71,7 @@
                 var oppLeft = opponent.x;
                 var oppRight = opponent.x + opponent.width;
                 var oppTop = opponent.y;
-                var oppBottom = opponent.y + opponent.width;
+                var oppBottom = opponent.y + opponent.height;
                 var crashed = true;
                 if (myLeft > oppRight || myTop > oppBottom || myRight < oppLeft || myBottom < oppTop) {
                     crashed = false;
@@ -104,7 +104,7 @@
                 //var y = myGM.canvas.height - 200;
                 var minHeight = 50;
                 var maxHeight = 200;
-                var minGap = 50;
+                var minGap = 100;
                 var maxGap = 200;
                 var height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
                 var gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);

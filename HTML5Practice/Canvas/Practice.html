@@ -15,12 +15,13 @@
     <script type="text/javascript">
 
         var redBox;
+        var scoreBox;
         var opponentBoxes = [];
 
         function startGM() {
             myGM.start();
             redBox = new component(50, 50, 10, 10, "red");            
-            //opponentBox = new component(10, 200, 400, 200, "green");
+            scoreBox = new component("30px", "Arial", 550, 50, "blue", "text");
         }
 
         var myGM = {
@@ -47,21 +48,29 @@
             }
         }
 
-        function component(width, height, x, y, color) {
+        function component(width, height, x, y, color, type) {
             this.width = width;
             this.height = height;
             this.x = x;
             this.y = y;
             this.speedX = 0;
             this.speedY = 0;
+            this.type = type;
             this.update = function () {
                 var ctx = myGM.context;
-                ctx.fillStyle = color,
-                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.fillStyle = color;
+                if (this.type == "text") {
+                    ctx.font = this.width + " " + this.height;
+                    ctx.fillText(this.text, this.x, this.y);
+                }
+                else {
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
             }
             this.changePosition = function () {
                 this.x += this.speedX;
                 this.y += this.speedY;
+                this.keepOnFloor();
             }
             this.isCrashed = function (opponent) {
                 var myLeft = this.x;
@@ -78,16 +87,15 @@
                 }
                 return crashed;
             }
-        }
-
-        function canAddOpponent(number)
-        {
-            if ((myGM.frameNo / number) % 1 == 0) { return true; }
-            return false;
-        }
+            this.keepOnFloor = function () {
+                var myTop = myGM.canvas.height - this.height;
+                if (this.y > myTop) {
+                    this.y = myTop;
+                }
+            }
+        }        
 
         function updateGM() {
-
             for (i = 0; i < opponentBoxes.length; i++) {
                 if (redBox.isCrashed(opponentBoxes[i])) {
                     myGM.stop();
@@ -100,15 +108,13 @@
 
             if (myGM.frameNo == 1 || canAddOpponent(150))
             {
-                var x = myGM.canvas.width;
-                //var y = myGM.canvas.height - 200;
+                var x = myGM.canvas.width;                
                 var minHeight = 50;
                 var maxHeight = 200;
                 var minGap = 100;
                 var maxGap = 200;
                 var height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
                 var gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-
 
                 opponentBoxes.push(new component(10, height, x, 0, "green"));
                 opponentBoxes.push(new component(10, x - height - gap, x, height + gap, "green"));
@@ -118,31 +124,39 @@
                 opponentBoxes[i].x -= 1;
                 opponentBoxes[i].update();
             }
-            //redBox.update();
+            
             if (myGM.key && myGM.key == 38) moveUp();
             if (myGM.key && myGM.key == 40) moveDown();
             if (myGM.key && myGM.key == 37) moveLeft();
             if (myGM.key && myGM.key == 39) moveRight();
             myGM.key = null;
+
+            scoreBox.text = "SCORE: " + myGM.frameNo;
+            scoreBox.update();
+
             redBox.changePosition();
             redBox.update();
+        }
 
+        function canAddOpponent(number) {
+            if ((myGM.frameNo / number) % 1 == 0) { return true; }
+            return false;
         }
 
         function moveUp() {
-            redBox.speedY -= 1;
+            redBox.speedY = -1;
         }
 
         function moveDown() {
-            redBox.speedY += 1;
+            redBox.speedY = 1;
         }
 
         function moveLeft() {
-            redBox.speedX -= 1;
+            redBox.speedX = -1;
         }
 
         function moveRight() {
-            redBox.speedX += 1;
+            redBox.speedX = 1;
         }
 
         function stopMove() {
